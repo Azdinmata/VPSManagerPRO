@@ -160,7 +160,16 @@ deploy_xui() {
     log "Deploying bundled 3X-UI panel..."
     install -d /usr/local/x-ui /usr/local/x-ui/bin
     install -m 0755 "$BUNDLE_DIR/panel/x-ui.sh" /usr/local/x-ui/x-ui.sh
-    install -m 0755 "$BUNDLE_DIR/panel/bin/xray-linux-amd64" /usr/local/x-ui/bin/xray-linux-amd64
+    local xray_src=""
+    case "$(uname -m)" in
+        x86_64)        xray_src="$BUNDLE_DIR/panel/bin/xray-linux-amd64" ;;
+        aarch64|arm64) xray_src="$BUNDLE_DIR/panel/bin/xray-linux-arm64" ;;
+    esac
+    if [[ -n "$xray_src" && -f "$xray_src" ]]; then
+        install -m 0755 "$xray_src" "/usr/local/x-ui/bin/$(basename "$xray_src")"
+    else
+        warn "no bundled xray binary for $(uname -m) - x-ui may fetch its own core."
+    fi
     install -m 0644 "$BUNDLE_DIR"/panel/bin/geoip*.dat  /usr/local/x-ui/bin/ 2>/dev/null || true
     install -m 0644 "$BUNDLE_DIR"/panel/bin/geosite*.dat /usr/local/x-ui/bin/ 2>/dev/null || true
     ln -sf /usr/local/x-ui/x-ui.sh /usr/local/bin/x-ui

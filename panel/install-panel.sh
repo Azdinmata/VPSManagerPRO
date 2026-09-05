@@ -42,7 +42,7 @@ cp -r "$SRC/systemd" "$SRC/config" "$PANEL_DIR/" 2>/dev/null || true
 # ---- install helper scripts + daemon binaries ------------------------------
 for s in user-add.sh user-del.sh user-update.sh desec-record.sh \
          install-dnstt.sh install-udpcustom.sh install-falconproxy.sh \
-         install-zivpn.sh service-ctl.sh; do
+         install-zivpn.sh install-v2ray.sh service-ctl.sh; do
   [ -f "$SRC/scripts/$s" ] || { echo "missing helper script: $s" >&2; exit 70; }
   install -m 0755 "$SRC/scripts/$s" "$SCRIPTS_DIR/$s"
 done
@@ -56,6 +56,18 @@ if [ -n "$DAEMONS_DIR" ]; then
   for f in falconproxy udp-custom dnstt-server-linux-amd64 dnstt-server-linux-arm64 zivpn; do
     [ -f "$DAEMONS_DIR/$f" ] && install -m 0755 "$DAEMONS_DIR/$f" "$BIN_DIR/$f"
   done
+fi
+
+# Seed the Xray core matching this machine's CPU arch for the panel's
+# /api/v2ray installer (install-v2ray.sh looks in $BIN_DIR).
+case "$(uname -m)" in
+  x86_64)        XRAY_SRC="$SRC/bin/xray-linux-amd64" ;;
+  aarch64|arm64) XRAY_SRC="$SRC/bin/xray-linux-arm64" ;;
+  *)             XRAY_SRC="" ;;
+esac
+if [ -n "$XRAY_SRC" ] && [ -f "$XRAY_SRC" ]; then
+  install -m 0755 "$XRAY_SRC" "$BIN_DIR/$(basename "$XRAY_SRC")"
+  echo "seeded $(basename "$XRAY_SRC") for $(uname -m)"
 fi
 
 # ---- build the panel ---------------------------------------------------------
