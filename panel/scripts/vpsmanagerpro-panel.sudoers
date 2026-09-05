@@ -1,0 +1,17 @@
+# OPTIONAL hardening template - only needed if you switch the panel systemd
+# unit to a non-root service user (e.g. User=vpsmanagerpro-panel below).
+# The shipped unit runs as root on 127.0.0.1 behind nginx TLS, so this file
+# is NOT installed by default. If you use it:
+#   1. adduser --system --group --shell /usr/sbin/nologin vpsmanagerpro-panel
+#   2. chown -R root:vpsmanagerpro-panel /opt/vpsmanagerpro-panel
+#   3. install -m 0440 -o root -g root this file /etc/sudoers.d/vpsmanagerpro-panel
+%vpsmanagerpro-panel ALL=(root) NOPASSWD:
+    /opt/vpsmanagerpro-panel/scripts/user-add.sh,
+    /opt/vpsmanagerpro-panel/scripts/user-del.sh,
+    /opt/vpsmanagerpro-panel/scripts/user-update.sh,
+    /opt/vpsmanagerpro-panel/scripts/desec-record.sh,
+    /opt/vpsmanagerpro-panel/scripts/install-dnstt.sh,
+    /opt/vpsmanagerpro-panel/scripts/install-udpcustom.sh,
+    /opt/vpsmanagerpro-panel/scripts/install-falconproxy.sh,
+    /opt/vpsmanagerpro-panel/scripts/install-zivpn.sh,
+    /opt/vpsmanagerpro-panel/scripts/service-ctl.sh

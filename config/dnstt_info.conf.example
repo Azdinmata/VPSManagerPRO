@@ -1,0 +1,12 @@
+# DNSTT deployment info (live location: /etc/vpsmanagerpro/dnstt_info.conf).
+# NS_SUBDOMAIN / TUNNEL_SUBDOMAIN are only set when the records were
+# auto-created through the MENU's deSEC flow (DNSTT_RECORDS_MANAGED=true).
+NS_SUBDOMAIN=""
+TUNNEL_SUBDOMAIN=""
+NS_DOMAIN="dnstt.your-domain.example"
+TUNNEL_DOMAIN="dnstt.your-domain.example"
+PUBLIC_KEY=""
+FORWARD_DESC="SSH (port 22)"
+DNSTT_RECORDS_MANAGED="false"
+HAS_IPV6="false"
+MTU_VALUE=""

@@ -1,0 +1,24 @@
+[Unit]
+Description=VPSManagerPRO Web Control Panel (Next.js)
+After=network.target nginx.service
+Wants=network.target
+
+[Service]
+Type=exec
+# The panel delegates privileged actions to helper scripts. It runs as root
+# so it can also read users.db / bandwidth / shadow for display. Bound to
+# 127.0.0.1 only; nginx fronts it with TLS.
+User=root
+Group=root
+WorkingDirectory=/opt/vpsmanagerpro-panel/panel
+Environment=NODE_ENV=production
+Environment=PORT=3100
+Environment=HOSTNAME=127.0.0.1
+ExecStart=/usr/bin/env node /opt/vpsmanagerpro-panel/panel/.next/standalone/server.js
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

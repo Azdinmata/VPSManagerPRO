@@ -1,0 +1,7 @@
+# Edge TLS certificate mode (deployed by menu's install_ssl_tunnel / edge stack).
+# Live location: /etc/vpsmanagerpro/edge_cert.conf
+#   selfsign -> nginx/haproxy use /etc/vpsmanagerpro/ssl/vpsmanagerpro.{crt,key,pem}
+#   certbot  -> nginx/haproxy use a Let's Encrypt certificate for EDGE_DOMAIN
+EDGE_CERT_MODE="certbot"
+EDGE_DOMAIN="example.com"
+EDGE_EMAIL="admin@example.com"

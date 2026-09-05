@@ -1,0 +1,17 @@
+# Reference unit. Fragmented UDP gateway compiled by install_badvpn() in the
+# menu from ambrop72/badvpn into /root/badvpn-build/udpgw/badvpn-udpgw.
+# Legacy companion of udp-custom; usually replaced by the udpgw.service above.
+[Unit]
+Description=BadVPN UDP Gateway
+After=network.target
+
+[Service]
+ExecStart=/root/badvpn-build/udpgw/badvpn-udpgw --listen-addr 0.0.0.0:7300 --max-clients 1000 --max-connections-for-client 8
+User=root
+Restart=always
+RestartSec=3
+StandardOutput=null
+StandardError=null
+
+[Install]
+WantedBy=multi-user.target

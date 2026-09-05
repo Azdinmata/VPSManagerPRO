@@ -1,0 +1,17 @@
+# Reference unit. install_falcon_proxy() in the menu regenerates this file
+# with the user-chosen ports. NOTE: -p/--ports takes a COMMA-SEPARATED list;
+# the old space-separated form ("-p 8080 8888") made the binary parse "8888"
+# as the positional `host` and the proxy would not work.
+[Unit]
+Description=Falcon Proxy (WebSockets/Socks)
+After=network.target
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/local/bin/falconproxy -p "8080,8888"
+Restart=always
+RestartSec=2s
+
+[Install]
+WantedBy=default.target

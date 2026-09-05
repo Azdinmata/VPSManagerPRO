@@ -1,0 +1,6 @@
+# Auto-generated deSEC subdomain info (live location: /etc/vpsmanagerpro/dns_info.conf)
+# Populated by the menu's "Generate DNS subdomain" flow under your own
+# DESEC_DOMAIN from /etc/vpsmanagerpro/desec.conf.
+SUBDOMAIN="vps-abcdef"
+FULL_DOMAIN="vps-abcdef.your-name.dedyn.io"
+HAS_IPV6="false"

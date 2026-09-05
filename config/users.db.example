@@ -1,0 +1,17 @@
+# VPSManagerPRO users.db — example only (do NOT deploy as the live database).
+#
+# Live format: /etc/vpsmanagerpro/users.db is created EMPTY by install.sh.
+#
+# One account per line, plaintext, colon-separated:
+#   username:password:YYYY-MM-DD:max_connections:killswitch(0|1):user_type
+#
+#   username        SSH login name (also a real system user)
+#   password        SSH account password (matches the system user password)
+#   expiry          account expiry date, YYYY-MM-DD
+#   max_connections max simultaneous SSH sessions allowed by the limiter
+#   killswitch      1 = kill all sessions when the expiry is reached
+#   user_type       "user" for permanent accounts, "trial" for trial accounts
+#                   (trial accounts are auto-removed on expiry)
+
+# Example row (trial account, expires 2026-12-31, 2 sessions, killswitch on):
+# demo:demo123:2026-12-31:2:1:trial

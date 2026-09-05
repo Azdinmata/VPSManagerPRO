@@ -1,0 +1,13 @@
+# VPSManagerPRO deSEC credentials (per-deployment).
+#
+# Deploy this file as /etc/vpsmanagerpro/desec.conf
+# 1. Register a free zone at https://desec.io
+# 2. Create a token (DNS permissions only)
+# 3. Paste the token and the zone name below.
+#
+# The MANAGER reads this file before touching the deSEC API, so the leaked
+# token from the original server is NOT used. DNS records are created under
+# your own zone instead of a shared third-party domain.
+
+DESEC_TOKEN="replace-with-your-desec-token"
+DESEC_DOMAIN="your-name.dedyn.io"

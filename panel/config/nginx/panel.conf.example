@@ -1,0 +1,40 @@
+# VPSManagerPRO panel - nginx TLS vhost (example)
+# Place in /etc/nginx/sites-available/panel.vpsmanagerpro.conf and symlink
+# into sites-enabled. Obtain a cert first:
+#   apt-get update && apt-get install -y certbot python3-certbot-nginx
+#   certbot --nginx -d panel.example.com
+# The panel itself only listens on 127.0.0.1:3100 and implements its own
+# login + TOTP 2FA; nginx just terminates TLS and streams requests through.
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name panel.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/panel.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/panel.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    client_max_body_size 8m;
+
+    # Bolt to plain HTTP upstream on loopback.
+    location / {
+        proxy_pass http://127.0.0.1:3100;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+    }
+}
+
+server {
+    listen 80;
+    server_name panel.example.com;
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+    location / { return 301 https://$host$request_uri; }
+}

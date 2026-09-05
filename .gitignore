@@ -1,0 +1,16 @@
+# Node / Next.js build artifacts
+node_modules/
+.next/
+out/
+standalone/
+
+# Logs & local config
+*.log
+*.pid
+.env
+.env.local
+
+# Editor
+.vscode/
+.idea/
+*.swp

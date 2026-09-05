@@ -1,0 +1,15 @@
+# Reference unit. install_dnstt() in the menu regenerates this file using the
+# deployed domain from /etc/vpsmanagerpro/dnstt_info.conf.
+[Unit]
+Description=DNSTT (DNS Tunnel) Server for SSH (port 22)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/dnstt-server -udp :53 -privkey-file /etc/vpsmanagerpro/dnstt/server.key dnstt.your-domain.example 127.0.0.1:22
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
