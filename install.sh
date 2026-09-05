@@ -344,12 +344,10 @@ EOF
             echo -e "  ${C_WHITE}LINK  →  https://$PANEL_HOSTNAME${C_RESET}"
             echo -e "  (obtain TLS first:  certbot --nginx -d $PANEL_HOSTNAME)"
         else
-            echo -e "  ${C_WHITE}LINK  →  http://localhost:3100${C_RESET}  (via SSH tunnel):"
-            echo -e "  ssh -L 3100:127.0.0.1:3100 root@${IP:-<SERVER_IP>}   # then open the link in your browser"
+            echo -e "  ${C_WHITE}LINK  →  http://${IP:-<SERVER_IP>}:3100${C_RESET}   (open directly in any browser)"
         fi
         if [[ -n "$PANEL_HOSTNAME" ]]; then
-            echo -e "  Until TLS is issued, the link above works through the same tunnel:"
-            echo -e "  ssh -L 3100:127.0.0.1:3100 root@${IP:-<SERVER_IP>}   # then open http://localhost:3100"
+            echo -e "  Until TLS is issued, reach it directly: http://${IP:-<SERVER_IP>}:3100"
         fi
         echo -e "  First login: user ${C_WHITE}admin${C_RESET}, set a password (8+ chars), then enroll the TOTP code."
     fi

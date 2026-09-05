@@ -93,7 +93,7 @@ if [ "$SKIP_NGINX" -eq 0 ] && [ -n "$HOSTNAME_ARG" ] && command -v nginx >/dev/n
 fi
 
 echo ""
-echo "==> Done. Panel running on 127.0.0.1:3100"
+echo "==> Done. Panel running on 0.0.0.0:3100"
 echo "    First login: username admin, any password >= 8 chars (used to set the"
 echo "    admin password on first use), then enroll a TOTP authenticator."
 echo "    For real use front with nginx TLS: see config/nginx/panel.conf.example"

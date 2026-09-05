@@ -50,8 +50,8 @@ menu
 
 The access link for the web panel is printed at the end of the install —
 `https://panel.example.com` if you passed `--panel-hostname`, otherwise
-`http://localhost:3100` reached through an SSH tunnel
-(`ssh -L 3100:127.0.0.1:3100 root@<SERVER_IP>`).
+`http://<VPS_IP>:3100` (open it directly in any browser; open TCP 3100 in the
+provider firewall if the panel is served by IP).
 
 The installer:
 - verifies bundle checksums,
@@ -227,7 +227,8 @@ VMP_ADMIN_USER=admin bash install-panel.sh --hostname panel.example.com
 
 - `install-panel.sh` installs the app to `/opt/vpsmanagerpro-panel`, seeds the
   bundled daemons, runs `npm install && npm run build`, installs the systemd
-  unit (root, `127.0.0.1:3100`) and optionally writes an nginx TLS vhost
+  unit (root, listening on `0.0.0.0:3100` so it's reachable online by direct
+  `http://<VPS_IP>:3100`) and optionally writes an nginx TLS vhost
   (`certbot --nginx`). Use `--no-nginx` to skip the web server bits.
 - State lives in `/etc/vpsmanagerpro/panel/` (`secret`, `admin.json`,
   `audit.jsonl`); install job logs under `/var/log/vpsmanagerpro-panel/jobs`.

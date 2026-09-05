@@ -6,14 +6,14 @@ Wants=network.target
 [Service]
 Type=exec
 # The panel delegates privileged actions to helper scripts. It runs as root
-# so it can also read users.db / bandwidth / shadow for display. Bound to
-# 127.0.0.1 only; nginx fronts it with TLS.
+# so it can also read users.db / bandwidth / shadow for display. Binds 0.0.0.0
+# so it's reachable online by IP:port; nginx may optionally front it with TLS.
 User=root
 Group=root
 WorkingDirectory=/opt/vpsmanagerpro-panel/panel
 Environment=NODE_ENV=production
 Environment=PORT=3100
-Environment=HOSTNAME=127.0.0.1
+Environment=HOSTNAME=0.0.0.0
 ExecStart=/usr/bin/env node /opt/vpsmanagerpro-panel/panel/.next/standalone/server.js
 Restart=on-failure
 RestartSec=3

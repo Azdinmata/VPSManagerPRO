@@ -1,72 +1,72 @@
-# VPSManagerPRO Live ? artifact checksums (sha256sum -c SHA256SUMS)
+# VPSManagerPRO Live - artifact checksums (sha256sum -c SHA256SUMS)
 # Regenerated on this build; verify binaries before deploying to a new VPS.
-214f5361980ff9b2af58b98912239533ac503f4de191d3deeac7c4b686b87ab7  menu
-  f6e783a3b65351c721ad6082d7f915cd3f36d01aabadbe3aa9a2333052cd71d4  daemons/falconproxy
-  bf291ed4b9988a82d5501bc45e23ceba6ff1e1b3439b43d73a94d4c9cc83ccd1  daemons/dnstt-server
-  48832133b7bdff20261bac41713e3ea231404b85764c1143d2095311867fb43f  daemons/udpgw
-  6b618ee8f007331edf636eddc29de4bdc047de4a95387dfd696c2268aa86936c  panel/x-ui.sh
-  b2c525e082cf2fef460499c88838d355f0b9bfb5a00bdb3eaa99b6af63825006  panel/bin/xray-linux-amd64
-  d2e9f275b996c5cf676be7c7e402726e1ee415f45662d69edd649494ca4d1713  panel/bin/geoip.dat
-  4a3a527923a1158ea0147c5e13b95103160f058b55898fd94f180ae65a6a91b5  panel/bin/geoip_IR.dat
-  98a9153a635001fbe2850bdfd78c63806cc7dc133bad470345760ab6cc42fac4  panel/bin/geoip_RU.dat
-  7e2ea2de78c494f34e12fbd047a24b1b495f76ac1adbc476e3ae3aa3f58ef849  panel/bin/geosite.dat
-  8f7f53b2a67adbc46e6a5bd9328a44e0b894e2aba60872287c364755f893c9b2  panel/bin/geosite_IR.dat
-  2de1ddf2e4e6764546c1f0189e6e49f07b9505e072262e0d222366a6cbc22390  panel/bin/geosite_RU.dat
-  ad6d10f572268d1bf7d1c554f945077cf5c9464ef8efc4a692d45c2343d83824  scripts/vpsmanagerpro-limiter.sh
-  332955d28e18f520ab90e8bc79297d2b4dc2d7586f6f3aa8c862c0496a72d2d0  scripts/vpsmanagerpro-trial-cleanup.sh
-  b466d8f588c61b4d83aa2ba8f3d6b0e9dab241b5e01e4670a530c88620fef085  panel/.gitignore
-  b5709680f6813985e66cf951f5065e8e9545561b4c666c80710835b494026e2b  panel/config/nginx/panel.conf.example
-  02f77006e6a7ea9e2b52f2a293d0bd5debafca7ff4ea0551dbe2d62b8b51c7c6  panel/install-panel.sh
-  e6e50d774ae29109b8933a935846ddb97c1ce8b3497d45451d2e664ebc398cce  panel/next.config.mjs
-  9dd9d642cdb87d4d5b3173217e0c45429b3e47a6f5cf5fb0ead6c644ec5fed01  panel/next-env.d.ts
-  170847e2acfd8f5377242100cc5b9c6905cd9630833a55364c62c342193a7e4b  panel/package.json
-  8768534db21954f10e13fcf76ff5849cc471b789f16f9ba93defc5730b2480bc  panel/scripts/desec-record.sh
-  a1316ddbbce54ad2d5ff9704b3a04afdfe2bf7e1e16198848ac151217f32feac  panel/scripts/vpsmanagerpro-panel.sudoers
-  ff2bff1bd5fdf1c33036011c9394bc2c7e47f5fc1b37db6284390cad1dab4aff  panel/scripts/install-dnstt.sh
-  53559525df89281058a87d5b8324dccbd31e8184e23169e13d54c76f9fbbaa17  panel/scripts/install-falconproxy.sh
-  3db910d5e29d6916a99a2c9eac37c383d59b4b44aafe8871d3274979edddf1dd  panel/scripts/install-udpcustom.sh
-  ff1d9da6813475e770d3b3a81d66374b3dd57dbd5775ea5c367af90add118c08  panel/scripts/install-zivpn.sh
-  162cab84ee06ae9067a1b91ac201e6877f2a41a985cdaaf76522321f2e6b40fc  panel/scripts/service-ctl.sh
-177f9a7dc2214ba5b30238901444e520d3662b93a6fbcb1fe8817cec28a4d0ff  panel/scripts/user-add.sh
-  2967fe77bb2bc332a160eaca2408d9dc77bc151071f7b3c27f21393b8fb4efe2  panel/scripts/user-del.sh
-2ff6173bc2603a37635390e036d2d1ddfac80793c2a88f46d6fba1c660263110  panel/scripts/user-update.sh
-  68bc3cb07bc854765d2239e5b4e922ca598a966f979c3d7ad36369fb172fb5bf  panel/src/app/(panel)/activity/page.tsx
-  9172c6694ab8fa70c50da86f7a06bc37323360d27fa23416b18f2b784ebfec11  panel/src/app/(panel)/bandwidth/page.tsx
-  56322e637e4613b293c47f8a2fb4ca8c5eca01ac1e387ff241b691e078f9a290  panel/src/app/(panel)/banner/page.tsx
-  a150e799ceccb2142ea94c3ce64c0ec71a32cf1cc54f19f052c8070237c4a6d5  panel/src/app/(panel)/dns/page.tsx
-  928152b505cf841485e343e319464b391da93abaf3c7bbcd62ae7bda269b974d  panel/src/app/(panel)/layout.tsx
-  1aaacce73b66247915fb9e9568368197fe872206085dc0634eee7052f899aa5e  panel/src/app/(panel)/page.tsx
-  9c1db4d2c9b963ff55b150d81aacfcad8840dc4b60233bc173b22fea4046639d  panel/src/app/(panel)/protocols/page.tsx
-  9e73569ecc3c8f0e97a7a5a9de269cb9ed649f160b082133022e07b38a2a9446  panel/src/app/(panel)/services/page.tsx
-  d3b77323ca9bdba4603c0a2be9d2a3b828884c5817fafce1e222d5a4d71df0fc  panel/src/app/(panel)/settings/page.tsx
-  36d225ad57f1594c1f0efd5700c533efb358828c06ae045a270a664690999266  panel/src/app/(panel)/users/page.tsx
-  6c000b7d9022111a8f6f845c041fe6dc4b1213a02de1c305444a23059f4787a8  panel/src/app/api/activity/route.ts
-  e43e2680bf589d842e9d406201862f0888e7de2f8ac6092d9353c38c4adf6a53  panel/src/app/api/auth/qr/route.ts
-  0cfad0472fae411e8d6a290054b90693d5f449f503e1a3ac95935c55335e9e51  panel/src/app/api/auth/route.ts
-  5c9c34369419700ef9ade6843059d8e976b27af4a3a619023e79cfe034699143  panel/src/app/api/auth/settings/route.ts
-  f1c19592f23d315e6f343fa1023adc5f3b68e32eb8ca9ef4c71983165bfd04ac  panel/src/app/api/bandwidth/route.ts
-  7e9b185f2bbb72c37bd288e00528226fdb4a9d1237e1b8633c0a7fc7612d48fd  panel/src/app/api/banner/route.ts
-  db88b7f8942e5249ed72c11e8b0347b487b297c78f65f15ff80e5a4493e1d668  panel/src/app/api/dns/route.ts
-  87bb21ee6ff4c1f4b2499ef4c6d0c465027aaebe9d4032a56bc12e9f7500d80e  panel/src/app/api/protocols/route.ts
-  39d558e79497cbfb9edd7e34483b95741fcba93506ea5990533515636d0902d9  panel/src/app/api/services/route.ts
-  6782dfbd6bca5bb0c7985e6c6b54c62742eb991d078faa00313722460b506c46  panel/src/app/api/settings/route.ts
-  77e71e8e86b2c99b2ed22e42c845c2192d59b1b73b668abc50e75e05bd694b1a  panel/src/app/api/system/route.ts
-  616694691d7f5d00cd62b6e67045fff17511e504811912dffbabfcc030edfa4c  panel/src/app/api/users/route.ts
-  2663b1f735703780a747583aa2381bea15407e186bf3c9ab3707471f0b0f51cc  panel/src/app/globals.css
-  3f873de06fe770928f17b1243ae28a4caf9b63efff6fd73936e0444597d40afc  panel/src/app/layout.tsx
-  d2a2f971cb11cd181bb13429b9ae8002e664ce82593033b12af215e27eebe7c6  panel/src/app/login/page.tsx
-  c92515ed0815dc731a39bb3df188c80ca7057b5c82623a5138312612a9dc3878  panel/src/components/Shell.tsx
-8fe2fb3d95f19aa46af279a0259c9bbd1cf60d3c0d9c24384b856881f23d8216  panel/src/lib/api.ts
-  8c338482f904eb1319cf6d678d99f52e44f8dbbf6eed183d8bafdbf7abf95a79  panel/src/lib/audit.ts
-  e37a627bea3cfdc2ef00ed5166addad99fd2cc29d1371a1d8470241a151e9195  panel/src/lib/auth.ts
-  a5680db22e86c1af3058f9b42c7d0081ebebcd577ff087975a5edd1ab4bfd5ed  panel/src/lib/banner.ts
-  560e78a1b220d3791f5a7e83276159d8c8d502259c743ec5dd52465d0fd63549  panel/src/lib/dns.ts
-  5750e78711792ca9214d2685613f357a795a27d71428ed1413269af4880f1fa0  panel/src/lib/exec.ts
-  7023918bdff2fbadf6695f448142674c4497806801b31d859c94d8d15d3dd834  panel/src/lib/jobs.ts
-a41cad194121e8ac3da3566ab2c5ff19833e47ee8c161acc669cb4679c579235  panel/src/lib/paths.ts
-1522bac518df942d2e3076e6fb9f6d9ba602361276dbc355fcc0a37a026654e3  panel/src/lib/req.ts
-  34b25700a429a18d81d9f9e18c045e7a4e967f34a83affa936da5c3d42533b88  panel/src/lib/system.ts
-  1cd2afcb9bb7f203abcc0c8a5f24412df31a77c29d707cafae2104bfd631fecd  panel/src/lib/token.ts
-  3baa65d0d91bb28728450a36015626a93c875ddadb1121d3e0ae09073645fb73  panel/src/lib/users.ts
-  3e8fe3160f484f9c3d68f17a64869d39481c39fd99be0a350a26cf8d0d0f9f96  panel/systemd/vpsmanagerpro-panel.service
-  b8248f7fa009f4c9bdab7ecd2d932309082a86725361787994e750849697eefe  panel/tsconfig.json
+214f5361980ff9b2af58b98912239533ac503f4de191d3deeac7c4b686b87ab7 *menu
+f6e783a3b65351c721ad6082d7f915cd3f36d01aabadbe3aa9a2333052cd71d4 *daemons/falconproxy
+bf291ed4b9988a82d5501bc45e23ceba6ff1e1b3439b43d73a94d4c9cc83ccd1 *daemons/dnstt-server
+48832133b7bdff20261bac41713e3ea231404b85764c1143d2095311867fb43f *daemons/udpgw
+6b618ee8f007331edf636eddc29de4bdc047de4a95387dfd696c2268aa86936c *panel/x-ui.sh
+b2c525e082cf2fef460499c88838d355f0b9bfb5a00bdb3eaa99b6af63825006 *panel/bin/xray-linux-amd64
+d2e9f275b996c5cf676be7c7e402726e1ee415f45662d69edd649494ca4d1713 *panel/bin/geoip.dat
+4a3a527923a1158ea0147c5e13b95103160f058b55898fd94f180ae65a6a91b5 *panel/bin/geoip_IR.dat
+98a9153a635001fbe2850bdfd78c63806cc7dc133bad470345760ab6cc42fac4 *panel/bin/geoip_RU.dat
+7e2ea2de78c494f34e12fbd047a24b1b495f76ac1adbc476e3ae3aa3f58ef849 *panel/bin/geosite.dat
+8f7f53b2a67adbc46e6a5bd9328a44e0b894e2aba60872287c364755f893c9b2 *panel/bin/geosite_IR.dat
+2de1ddf2e4e6764546c1f0189e6e49f07b9505e072262e0d222366a6cbc22390 *panel/bin/geosite_RU.dat
+ad6d10f572268d1bf7d1c554f945077cf5c9464ef8efc4a692d45c2343d83824 *scripts/vpsmanagerpro-limiter.sh
+332955d28e18f520ab90e8bc79297d2b4dc2d7586f6f3aa8c862c0496a72d2d0 *scripts/vpsmanagerpro-trial-cleanup.sh
+b466d8f588c61b4d83aa2ba8f3d6b0e9dab241b5e01e4670a530c88620fef085 *panel/.gitignore
+b5709680f6813985e66cf951f5065e8e9545561b4c666c80710835b494026e2b *panel/config/nginx/panel.conf.example
+9a66516442942c70e4ebcb0419d1e2b5556b3726e5ad9735feded9b5dad5b51d *panel/install-panel.sh
+e6e50d774ae29109b8933a935846ddb97c1ce8b3497d45451d2e664ebc398cce *panel/next.config.mjs
+9dd9d642cdb87d4d5b3173217e0c45429b3e47a6f5cf5fb0ead6c644ec5fed01 *panel/next-env.d.ts
+170847e2acfd8f5377242100cc5b9c6905cd9630833a55364c62c342193a7e4b *panel/package.json
+8768534db21954f10e13fcf76ff5849cc471b789f16f9ba93defc5730b2480bc *panel/scripts/desec-record.sh
+a1316ddbbce54ad2d5ff9704b3a04afdfe2bf7e1e16198848ac151217f32feac *panel/scripts/vpsmanagerpro-panel.sudoers
+ff2bff1bd5fdf1c33036011c9394bc2c7e47f5fc1b37db6284390cad1dab4aff *panel/scripts/install-dnstt.sh
+53559525df89281058a87d5b8324dccbd31e8184e23169e13d54c76f9fbbaa17 *panel/scripts/install-falconproxy.sh
+3db910d5e29d6916a99a2c9eac37c383d59b4b44aafe8871d3274979edddf1dd *panel/scripts/install-udpcustom.sh
+ff1d9da6813475e770d3b3a81d66374b3dd57dbd5775ea5c367af90add118c08 *panel/scripts/install-zivpn.sh
+162cab84ee06ae9067a1b91ac201e6877f2a41a985cdaaf76522321f2e6b40fc *panel/scripts/service-ctl.sh
+177f9a7dc2214ba5b30238901444e520d3662b93a6fbcb1fe8817cec28a4d0ff *panel/scripts/user-add.sh
+2967fe77bb2bc332a160eaca2408d9dc77bc151071f7b3c27f21393b8fb4efe2 *panel/scripts/user-del.sh
+2ff6173bc2603a37635390e036d2d1ddfac80793c2a88f46d6fba1c660263110 *panel/scripts/user-update.sh
+68bc3cb07bc854765d2239e5b4e922ca598a966f979c3d7ad36369fb172fb5bf *panel/src/app/(panel)/activity/page.tsx
+9172c6694ab8fa70c50da86f7a06bc37323360d27fa23416b18f2b784ebfec11 *panel/src/app/(panel)/bandwidth/page.tsx
+56322e637e4613b293c47f8a2fb4ca8c5eca01ac1e387ff241b691e078f9a290 *panel/src/app/(panel)/banner/page.tsx
+a150e799ceccb2142ea94c3ce64c0ec71a32cf1cc54f19f052c8070237c4a6d5 *panel/src/app/(panel)/dns/page.tsx
+928152b505cf841485e343e319464b391da93abaf3c7bbcd62ae7bda269b974d *panel/src/app/(panel)/layout.tsx
+1aaacce73b66247915fb9e9568368197fe872206085dc0634eee7052f899aa5e *panel/src/app/(panel)/page.tsx
+9c1db4d2c9b963ff55b150d81aacfcad8840dc4b60233bc173b22fea4046639d *panel/src/app/(panel)/protocols/page.tsx
+9e73569ecc3c8f0e97a7a5a9de269cb9ed649f160b082133022e07b38a2a9446 *panel/src/app/(panel)/services/page.tsx
+d3b77323ca9bdba4603c0a2be9d2a3b828884c5817fafce1e222d5a4d71df0fc *panel/src/app/(panel)/settings/page.tsx
+36d225ad57f1594c1f0efd5700c533efb358828c06ae045a270a664690999266 *panel/src/app/(panel)/users/page.tsx
+6c000b7d9022111a8f6f845c041fe6dc4b1213a02de1c305444a23059f4787a8 *panel/src/app/api/activity/route.ts
+e43e2680bf589d842e9d406201862f0888e7de2f8ac6092d9353c38c4adf6a53 *panel/src/app/api/auth/qr/route.ts
+0cfad0472fae411e8d6a290054b90693d5f449f503e1a3ac95935c55335e9e51 *panel/src/app/api/auth/route.ts
+5c9c34369419700ef9ade6843059d8e976b27af4a3a619023e79cfe034699143 *panel/src/app/api/auth/settings/route.ts
+f1c19592f23d315e6f343fa1023adc5f3b68e32eb8ca9ef4c71983165bfd04ac *panel/src/app/api/bandwidth/route.ts
+7e9b185f2bbb72c37bd288e00528226fdb4a9d1237e1b8633c0a7fc7612d48fd *panel/src/app/api/banner/route.ts
+db88b7f8942e5249ed72c11e8b0347b487b297c78f65f15ff80e5a4493e1d668 *panel/src/app/api/dns/route.ts
+87bb21ee6ff4c1f4b2499ef4c6d0c465027aaebe9d4032a56bc12e9f7500d80e *panel/src/app/api/protocols/route.ts
+39d558e79497cbfb9edd7e34483b95741fcba93506ea5990533515636d0902d9 *panel/src/app/api/services/route.ts
+6782dfbd6bca5bb0c7985e6c6b54c62742eb991d078faa00313722460b506c46 *panel/src/app/api/settings/route.ts
+77e71e8e86b2c99b2ed22e42c845c2192d59b1b73b668abc50e75e05bd694b1a *panel/src/app/api/system/route.ts
+616694691d7f5d00cd62b6e67045fff17511e504811912dffbabfcc030edfa4c *panel/src/app/api/users/route.ts
+2663b1f735703780a747583aa2381bea15407e186bf3c9ab3707471f0b0f51cc *panel/src/app/globals.css
+3f873de06fe770928f17b1243ae28a4caf9b63efff6fd73936e0444597d40afc *panel/src/app/layout.tsx
+d2a2f971cb11cd181bb13429b9ae8002e664ce82593033b12af215e27eebe7c6 *panel/src/app/login/page.tsx
+c92515ed0815dc731a39bb3df188c80ca7057b5c82623a5138312612a9dc3878 *panel/src/components/Shell.tsx
+8fe2fb3d95f19aa46af279a0259c9bbd1cf60d3c0d9c24384b856881f23d8216 *panel/src/lib/api.ts
+8c338482f904eb1319cf6d678d99f52e44f8dbbf6eed183d8bafdbf7abf95a79 *panel/src/lib/audit.ts
+e37a627bea3cfdc2ef00ed5166addad99fd2cc29d1371a1d8470241a151e9195 *panel/src/lib/auth.ts
+a5680db22e86c1af3058f9b42c7d0081ebebcd577ff087975a5edd1ab4bfd5ed *panel/src/lib/banner.ts
+560e78a1b220d3791f5a7e83276159d8c8d502259c743ec5dd52465d0fd63549 *panel/src/lib/dns.ts
+5750e78711792ca9214d2685613f357a795a27d71428ed1413269af4880f1fa0 *panel/src/lib/exec.ts
+7023918bdff2fbadf6695f448142674c4497806801b31d859c94d8d15d3dd834 *panel/src/lib/jobs.ts
+a41cad194121e8ac3da3566ab2c5ff19833e47ee8c161acc669cb4679c579235 *panel/src/lib/paths.ts
+1522bac518df942d2e3076e6fb9f6d9ba602361276dbc355fcc0a37a026654e3 *panel/src/lib/req.ts
+34b25700a429a18d81d9f9e18c045e7a4e967f34a83affa936da5c3d42533b88 *panel/src/lib/system.ts
+1cd2afcb9bb7f203abcc0c8a5f24412df31a77c29d707cafae2104bfd631fecd *panel/src/lib/token.ts
+3baa65d0d91bb28728450a36015626a93c875ddadb1121d3e0ae09073645fb73 *panel/src/lib/users.ts
+c0d2cd058d06ae0dce78f754f61798c86ea78c6fff052ce382519b7fb7597364 *panel/systemd/vpsmanagerpro-panel.service
+b8248f7fa009f4c9bdab7ecd2d932309082a86725361787994e750849697eefe *panel/tsconfig.json
