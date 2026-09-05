@@ -242,6 +242,26 @@ open_base_ports() {
     ok "Base ports opened."
 }
 
+setup_ufw_firewall() {
+    log "Configuring UFW as the system firewall (all ports open TCP/UDP)..."
+    if ! command -v ufw >/dev/null 2>&1; then
+        DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Use-Pty=0 install ufw >/dev/null 2>&1 || true
+    fi
+    if ! command -v ufw >/dev/null 2>&1; then
+        warn "UFW could not be installed - leaving iptables as-is."
+        return 1
+    fi
+    ufw default allow incoming >/dev/null 2>&1 || true
+    ufw default allow outgoing >/dev/null 2>&1 || true
+    ufw allow 1:65535/tcp >/dev/null 2>&1 || true
+    ufw allow 1:65535/udp >/dev/null 2>&1 || true
+    if ufw --force enable >/dev/null 2>&1; then
+        ok "UFW active - ALL ports open (TCP/UDP 1-65535). No service port is blocked."
+    else
+        warn "ufw --force enable failed - inspect manually."
+    fi
+}
+
 run_menu_setup() {
     log "Running menu core setup (limiter + bandwidth + trial-cleanup services)..."
     if ! command -v menu >/dev/null 2>&1; then
@@ -376,6 +396,7 @@ main() {
     configure_desec
     configure_edge_prefs
     open_base_ports
+    setup_ufw_firewall
     run_menu_setup
     compat_aliases
     install_panel
