@@ -75,7 +75,63 @@ export function defaultPort(protocol: XrayProtocol): number {
   return DEFAULT_PORTS[protocol];
 }
 
-function buildInbound(store: XrayStore, account: XrayAccount) {
+const MUX_INNER_VLESS_BASE = 10001;
+
+function distinct<T>(arr: T[]): T[] {
+  return Array.from(new Set(arr));
+}
+
+function pathOr(a: XrayAccount, fallback: string): string {
+  return a.path && a.path.trim() !== "" ? a.path : fallback;
+}
+
+/** True when the given port is the TLS entry point of a Trojan (TCP) inbound. */
+function trojanMuxPort(store: XrayStore, port: number): boolean {
+  return store.accounts.some((a) => a.protocol === "trojan" && a.network === "tcp" && a.port === port);
+}
+
+function buildTrojanInbound(store: XrayStore, accounts: XrayAccount[], fallbacks: Array<{ path: string; dest: string }>) {
+  const inbound: Record<string, unknown> = {
+    tag: `trojan-${accounts[0].id}`,
+    protocol: "trojan",
+    port: accounts[0].port,
+    settings: {
+      clients: accounts.map((a) => ({ password: a.secret, email: a.name })),
+      decryption: "none",
+    },
+    streamSettings: {
+      network: "tcp",
+      security: "tls",
+      tlsSettings: {
+        certificates: [{ certificateFile: store.tlsCert, keyFile: store.tlsKey }],
+      },
+    },
+  };
+  if (fallbacks.length) {
+    inbound.settings = { ...(inbound.settings as Record<string, unknown>), fallbacks };
+  }
+  return inbound;
+}
+
+function buildWSInbound(slot: number, protocol: "vless" | "vmess", accounts: XrayAccount[]) {
+  return {
+    tag: `${protocol}-inner-${slot}`,
+    protocol,
+    port: slot,
+    listen: "127.0.0.1",
+    settings:
+      protocol === "vless"
+        ? { clients: accounts.map((a) => ({ id: a.secret, email: a.name, flow: a.flow ?? "" })), decryption: "none" }
+        : { clients: accounts.map((a) => ({ id: a.secret, email: a.name, alterId: 0 })) },
+    streamSettings: {
+      network: "ws",
+      security: "none",
+      wsSettings: { path: pathOr(accounts[0], protocol === "vless" ? DEFAULT_PATHS.vless : DEFAULT_PATHS.vmess) },
+    },
+  };
+}
+
+function buildLegacyInbound(store: XrayStore, account: XrayAccount) {
   const base: Record<string, unknown> = {
     tag: `${account.protocol}-${account.id}`,
     protocol: account.protocol,
@@ -92,16 +148,11 @@ function buildInbound(store: XrayStore, account: XrayAccount) {
       network: account.network,
       security: "tls",
       tlsSettings: {
-        certificates: [
-          {
-            certificateFile: store.tlsCert,
-            keyFile: store.tlsKey,
-          },
-        ],
+        certificates: [{ certificateFile: store.tlsCert, keyFile: store.tlsKey }],
       },
     };
     if (account.network === "ws") {
-      (base.streamSettings as Record<string, unknown>).wsSettings = { path: account.path ?? DEFAULT_PATHS.trojan };
+      (base.streamSettings as Record<string, unknown>).wsSettings = { path: pathOr(account, DEFAULT_PATHS.trojan) };
     }
     return base;
   }
@@ -114,7 +165,7 @@ function buildInbound(store: XrayStore, account: XrayAccount) {
     base.streamSettings = {
       network: account.network,
       security: "none",
-      wsSettings: account.network === "ws" ? { path: account.path ?? DEFAULT_PATHS.vless } : undefined,
+      wsSettings: account.network === "ws" ? { path: pathOr(account, DEFAULT_PATHS.vless) } : undefined,
     };
     return base;
   }
@@ -126,14 +177,59 @@ function buildInbound(store: XrayStore, account: XrayAccount) {
   base.streamSettings = {
     network: account.network,
     security: "none",
-    wsSettings: account.network === "ws" ? { path: account.path ?? DEFAULT_PATHS.vmess } : undefined,
+    wsSettings: account.network === "ws" ? { path: pathOr(account, DEFAULT_PATHS.vmess) } : undefined,
   };
   return base;
 }
 
-/** Writes an Xray JSON config for every account, keyed by one inbound per account. */
+/**
+ * Writes an Xray JSON config. When Trojan(TCP) accounts exist, a single TLS
+ * "Trojan" inbound terminates TLS and uses WebSocket path fallbacks into loopback
+ * VLESS/VMess inbounds — one public port, all three protocols. Otherwise one
+ * inbound per account is emitted.
+ */
 export function buildXrayConfig(store: XrayStore): string {
-  const inbounds = store.accounts.map((a) => buildInbound(store, a));
+  const trojanTcp = store.accounts.filter((a) => a.protocol === "trojan" && a.network === "tcp");
+  // Everything except muxed members: only Trojan-over-WS accounts can still need a
+  // legacy inbound when the mux is active (VLESS/VMess get loopback inner inbounds).
+  const other = store.accounts.filter((a) => a.protocol === "trojan" && a.network !== "tcp");
+  const vless = store.accounts.filter((a) => a.protocol === "vless");
+  const vmess = store.accounts.filter((a) => a.protocol === "vmess");
+
+  let inbounds: Record<string, unknown>[];
+
+  if (trojanTcp.length > 0) {
+    const vlessPaths = Array.from(distinct(vless.map((a) => pathOr(a, DEFAULT_PATHS.vless))));
+    const vmessPaths = Array.from(distinct(vmess.map((a) => pathOr(a, DEFAULT_PATHS.vmess))));
+    let nextInner = MUX_INNER_VLESS_BASE;
+    const vlessPort = new Map(vlessPaths.map((p) => [p, nextInner++] as const));
+    const vmessPort = new Map(vmessPaths.map((p) => [p, nextInner++] as const));
+
+    const fallbacks: Array<{ path: string; dest: string }> = [
+      ...vlessPaths.map((p) => ({ path: p, dest: `127.0.0.1:${vlessPort.get(p)!}` })),
+      ...vmessPaths.map((p) => ({ path: p, dest: `127.0.0.1:${vmessPort.get(p)!}` })),
+    ];
+
+    const trojanByPort = new Map<number, XrayAccount[]>();
+    for (const a of trojanTcp) {
+      if (!trojanByPort.has(a.port)) trojanByPort.set(a.port, []);
+      trojanByPort.get(a.port)!.push(a);
+    }
+
+    const muxInbounds = Array.from(trojanByPort.values()).map((group) => buildTrojanInbound(store, group, fallbacks));
+    const innerInbounds: Record<string, unknown>[] = [];
+    for (const p of vlessPaths) {
+      innerInbounds.push(buildWSInbound(vlessPort.get(p)!, "vless", vless.filter((a) => pathOr(a, DEFAULT_PATHS.vless) === p)));
+    }
+    for (const p of vmessPaths) {
+      innerInbounds.push(buildWSInbound(vmessPort.get(p)!, "vmess", vmess.filter((a) => pathOr(a, DEFAULT_PATHS.vmess) === p)));
+    }
+
+    inbounds = [...muxInbounds, ...other.map((a) => buildLegacyInbound(store, a)), ...innerInbounds];
+  } else {
+    inbounds = store.accounts.map((a) => buildLegacyInbound(store, a));
+  }
+
   const config = {
     log: { loglevel: "warning" },
     inbounds,
@@ -169,23 +265,28 @@ export async function restartXray(): Promise<{ ok: boolean; error?: string }> {
 async function buildClientLink(store: XrayStore, account: XrayAccount): Promise<string> {
   const host = await xrayServerHost(store);
   const name = encodeURIComponent(account.name);
+  const muxed = account.protocol !== "trojan" && trojanMuxPort(store, account.port);
 
   if (account.protocol === "trojan") {
-    const query = account.network === "ws"
-      ? `security=tls&type=ws&path=${encodeURIComponent(account.path ?? DEFAULT_PATHS.trojan)}&host=${host}#${name}`
-      : `security=tls&type=tcp#${name}`;
+    const query =
+      account.network === "ws"
+        ? `security=tls&type=ws&path=${encodeURIComponent(pathOr(account, DEFAULT_PATHS.trojan))}&host=${host}&sni=${host}&allowInsecure=1#${name}`
+        : `security=tls&type=tcp&sni=${host}&allowInsecure=1#${name}`;
     return `trojan://${account.secret}@${host}:${account.port}?${query}`;
   }
 
   if (account.protocol === "vless") {
-    const query = account.network === "ws"
-      ? `type=ws&path=${encodeURIComponent(account.path ?? DEFAULT_PATHS.vless)}&host=${host}&security=none&encryption=none#${name}`
-      : `type=tcp&security=none&encryption=none#${name}`;
+    const query =
+      account.network === "ws"
+        ? muxed
+          ? `type=ws&path=${encodeURIComponent(pathOr(account, DEFAULT_PATHS.vless))}&host=${host}&security=tls&sni=${host}&allowInsecure=1&encryption=none#${name}`
+          : `type=ws&path=${encodeURIComponent(pathOr(account, DEFAULT_PATHS.vless))}&host=${host}&security=none&encryption=none#${name}`
+        : `type=tcp&security=none&encryption=none#${name}`;
     return `vless://${account.secret}@${host}:${account.port}?${query}`;
   }
 
   // vmess — JSON encoded into vmess://
-  const vmess = {
+  const vmess: Record<string, string> = {
     v: "2",
     ps: account.name,
     add: host,
@@ -195,10 +296,14 @@ async function buildClientLink(store: XrayStore, account: XrayAccount): Promise<
     net: account.network,
     type: account.network === "ws" ? "ws" : "none",
     host,
-    path: account.network === "ws" ? account.path ?? DEFAULT_PATHS.vmess : "",
-    tls: "none",
+    path: account.network === "ws" ? pathOr(account, DEFAULT_PATHS.vmess) : "",
+    tls: muxed ? "tls" : "none",
     scy: "auto",
   };
+  if (muxed) {
+    vmess.sni = host;
+    vmess.allowInsecure = "1";
+  }
   return `vmess://${Buffer.from(JSON.stringify(vmess)).toString("base64")}`;
 }
 
@@ -299,7 +404,9 @@ export function addXrayBundle(
       protocol,
       name: username,
       secret: generateSecret(protocol),
-      port: defaultPort(protocol),
+      // All bundle members share the single TLS entry port (443 by default) so
+      // Trojan terminates TLS and VLESS/VMess ride the same port via WS fallback.
+      port: 443,
       flow: protocol === "vless" ? "" : undefined,
       network: protocol === "trojan" ? "tcp" : "ws",
       path: protocol === "trojan" ? "" : DEFAULT_PATHS[protocol],

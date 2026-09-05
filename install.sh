@@ -365,6 +365,8 @@ ${C_GREEN}  VPSManagerPRO Live is installed.${C_RESET}
     5. Edge stack (HAProxy)   →  port 80/443 routing; uses the generated .pem
     6. 3X-UI panel            →  already deployed at /usr/local/x-ui
        (first run creates credentials; change them via: x-ui settings)
+    7. V2Ray bundle            →  menu: Protocol & Panel Management → option 18
+       (VLESS + VMess + Trojan, single TLS port 443, share links printed there)
 
   VERIFY THE FALCON PROXY:
     systemctl status falconproxy
@@ -409,6 +411,12 @@ main() {
     run_menu_setup
     compat_aliases
     install_panel
+    # If a Xray core is already present after the panel install, generate the
+    # V2Ray bundle (VLESS+VMess+Trojan on one TLS port 443) from the CLI twin of
+    # the panel logic. Otherwise it can be created later via menu option 18.
+    if [[ -x /usr/local/bin/xray && -x "$BUNDLE_DIR/panel/scripts/gen-xray-bundle.sh" ]]; then
+        bash "$BUNDLE_DIR/panel/scripts/gen-xray-bundle.sh" --name demo >/dev/null 2>&1 || true
+    fi
     print_summary
 }
 

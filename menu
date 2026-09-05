@@ -3817,6 +3817,50 @@ uninstall_3xui_panel() {
     fi
 }
 
+v2ray_bundle_script() {
+    # Prefer the deployed panel helper, fall back to the bundle copy next to the menu.
+    if [ -f /opt/vpsmanagerpro-panel/scripts/gen-xray-bundle.sh ]; then
+        echo /opt/vpsmanagerpro-panel/scripts
+        return
+    fi
+    local here
+    here="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
+    if [ -f "$here/../panel/scripts/gen-xray-bundle.sh" ]; then
+        echo "$here/../panel/scripts"
+        return
+    fi
+    echo ""
+}
+
+install_v2ray_bundle() {
+    clear; show_banner
+    echo -e "${C_BOLD}${C_PURPLE}--- 🚀 V2Ray Bundle: VLESS + VMess + Trojan (single TLS port 443) ---${C_RESET}"
+    local bs
+    bs="$(v2ray_bundle_script)"
+    if [[ -z "$bs" ]]; then
+        echo -e "${C_RED}❌ gen-xray-bundle.sh not found (install the web panel first via install.sh).${C_RESET}"
+        return
+    fi
+    if [[ ! -x /usr/local/bin/xray ]]; then
+        echo -e "${C_BLUE}⚙️ Xray core not installed - installing it first...${C_RESET}"
+        if [[ -x "$bs/install-v2ray.sh" ]]; then
+            bash "$bs/install-v2ray.sh" --force || { echo -e "${C_RED}❌ core install failed${C_RESET}"; return; }
+        else
+            echo -e "${C_RED}❌ install-v2ray.sh missing in $bs${C_RESET}"
+            return
+        fi
+    fi
+    read -r -p "👉 Account name (default: demo): " bname
+    bname="${bname:-demo}"
+    echo
+    if bash "$bs/gen-xray-bundle.sh" --name "$bname"; then
+        echo -e "\n${C_GREEN}✅ Bundle generated.${C_RESET}"
+        echo -e "${C_BOLD}Your share links (self-signed TLS on port 443):${C_RESET}"
+        bash "$bs/gen-xray-bundle.sh" --name "$bname" --print-links || true
+        echo -e "\n${C_YELLOW}Tip: links include allowInsecure=1 (self-signed cert). Import into v2rayNG / v2rayN.${C_RESET}"
+    fi
+}
+
 refresh_ssh_session_cache() {
     local now db_mtime
     printf -v now '%(%s)T' -1
@@ -3963,6 +4007,7 @@ protocol_menu() {
 
         local nginx_status; if systemctl is-active --quiet nginx; then nginx_status="${C_STATUS_A}(Active)${C_RESET}"; else nginx_status="${C_STATUS_I}(Inactive)${C_RESET}"; fi
         local xui_status; if command -v x-ui &> /dev/null; then xui_status="${C_STATUS_A}(Installed)${C_RESET}"; else xui_status="${C_STATUS_I}(Not Installed)${C_RESET}"; fi  # 3X-UI uses same 'x-ui' binary name
+        local v2ray_status; if systemctl is-active --quiet vpsmanagerpro-xray; then v2ray_status="${C_STATUS_A}(Active)${C_RESET}"; else v2ray_status="${C_STATUS_I}(Inactive)${C_RESET}"; fi
         
         echo -e "\n   ${C_TITLE}══════════════[ ${C_BOLD}🔌 PROTOCOL & PANEL MANAGEMENT ${C_RESET}${C_TITLE}]══════════════${C_RESET}"
         echo -e "     ${C_ACCENT}--- TUNNELLING PROTOCOLS---${C_RESET}"
@@ -3979,6 +4024,7 @@ protocol_menu() {
         printf "     ${C_CHOICE}[11]${C_RESET} %-45s %s\n" "🌐 Install/Manage Internal Nginx (8880/8443)" "$nginx_status"
         printf "     ${C_CHOICE}[16]${C_RESET} %-45s %s\n" "🛡️ Install ZiVPN (UDP 5667)" "$zivpn_status"
         printf "     ${C_CHOICE}[17]${C_RESET} %-45s\n" "🗑️ Uninstall ZiVPN"
+        printf "     ${C_CHOICE}[18]${C_RESET} %-45s %s\n" "🚀 Install/View V2Ray Bundle (VLESS+VMess+Trojan :443)" "$v2ray_status"
         
         echo -e "     ${C_ACCENT}--- 💻 MANAGEMENT PANELS ---${C_RESET}"
         printf "     ${C_CHOICE}[12]${C_RESET} %-45s %s\n" "💻 Install 3X-UI Panel" "$xui_status"
@@ -4000,6 +4046,7 @@ protocol_menu() {
             11) nginx_proxy_menu ;;
             12) install_3xui_panel; press_enter ;; 13) uninstall_3xui_panel; press_enter ;;
             16) install_zivpn; press_enter ;; 17) uninstall_zivpn; press_enter ;;
+            18) install_v2ray_bundle; press_enter ;;
             0) return ;;
             *) invalid_option ;;
         esac

@@ -42,7 +42,8 @@ cp -r "$SRC/systemd" "$SRC/config" "$PANEL_DIR/" 2>/dev/null || true
 # ---- install helper scripts + daemon binaries ------------------------------
 for s in user-add.sh user-del.sh user-update.sh desec-record.sh \
          install-dnstt.sh install-udpcustom.sh install-falconproxy.sh \
-         install-zivpn.sh install-v2ray.sh service-ctl.sh; do
+         install-zivpn.sh install-v2ray.sh service-ctl.sh \
+         gen-xray-bundle.sh xray-bundle.js; do
   [ -f "$SRC/scripts/$s" ] || { echo "missing helper script: $s" >&2; exit 70; }
   install -m 0755 "$SRC/scripts/$s" "$SCRIPTS_DIR/$s"
 done
