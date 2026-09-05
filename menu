@@ -3153,17 +3153,32 @@ install_falcon_proxy() {
     fi
 
     local SELECTED_VERSION="bundled"
-    local source_bin=""
-    if [[ -f "$FALCONPROXY_BINARY" ]]; then
-        source_bin="$FALCONPROXY_BINARY"
-        echo -e "${C_BLUE}ℹ️ Using the deployed falconproxy binary ($FALCONPROXY_BINARY).${C_RESET}"
-    elif [[ -f "$FALCONPROXY_BUNDLE_BIN" ]]; then
-        source_bin="$FALCONPROXY_BUNDLE_BIN"
-        echo -e "${C_BLUE}ℹ️ Using the bundled falconproxy binary.${C_RESET}"
-    else
-        echo -e "\n${C_RED}❌ No Falcon Proxy binary found locally (checked $FALCONPROXY_BINARY and $FALCONPROXY_BUNDLE_BIN).${C_RESET}"
-        echo -e "${C_YELLOW}ℹ️ The original GitHub release host (github.com/vpsmanagerpros/VPSManagerPRO-Manager) is offline.${C_RESET}"
-        echo -e "${C_YELLOW}   A bundled binary is therefore required — deploy it by running the official installer (install.sh).${C_RESET}"
+    local arch source_bin=""
+    arch=$(uname -m)
+    echo -e "${C_BLUE}ℹ️ Detected architecture: $arch.${C_RESET}"
+
+    # Auto-detect a runnable falconproxy binary for THIS machine: prefer the
+    # deployed copy, then the bundled one, whichever can actually execute here
+    # (matches arch). On ARM you can drop your own build at FALCONPROXY_BINARY.
+    local c
+    for c in "$FALCONPROXY_BINARY" "$FALCONPROXY_BUNDLE_BIN"; do
+        [[ -f "$c" ]] || continue
+        if "$c" --help >/dev/null 2>&1; then
+            source_bin="$c"
+            break
+        fi
+    done
+
+    if [[ -z "$source_bin" ]]; then
+        echo -e "\n${C_RED}❌ No runnable falconproxy binary found for this server (arch: $arch).${C_RESET}"
+        echo -e "${C_YELLOW}ℹ️ Checked: $FALCONPROXY_BINARY and $FALCONPROXY_BUNDLE_BIN.${C_RESET}"
+        echo -e "${C_YELLOW}ℹ️ The bundled falconproxy is built for x86-64 only, and the original GitHub release host is offline,${C_RESET}"
+        echo -e "${C_YELLOW}   so the installer cannot fetch a matching build automatically.${C_RESET}"
+        if [[ "$arch" == "aarch64" || "$arch" == "arm64" ]]; then
+            echo -e "${C_YELLOW}   On this ARM server, place your own arm64 falconproxy binary at:${C_RESET}"
+            echo -e "${C_CYAN}   $FALCONPROXY_BINARY${C_RESET}"
+        fi
+        echo -e "${C_YELLOW}   Use DNSTT, udp-custom, ZiVPN, or the 3X-UI panel instead.${C_RESET}"
         return
     fi
 

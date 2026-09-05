@@ -135,11 +135,17 @@ deploy_menu() {
 
 deploy_daemons() {
     log "Deploying tunnel daemons..."
-    install -m 0755 "$BUNDLE_DIR/daemons/falconproxy"   /usr/local/bin/falconproxy
-    install -m 0755 "$BUNDLE_DIR/daemons/falconproxy"   /usr/local/lib/vpsmanagerpro/falconproxy
     install -m 0755 "$BUNDLE_DIR/daemons/dnstt-server" /usr/local/bin/dnstt-server
     install -m 0755 "$BUNDLE_DIR/daemons/udpgw"        /usr/local/bin/udpgw
-    ok "falconproxy, dnstt-server and udpgw deployed."
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        install -m 0755 "$BUNDLE_DIR/daemons/falconproxy" /usr/local/bin/falconproxy
+        install -m 0755 "$BUNDLE_DIR/daemons/falconproxy" /usr/local/lib/vpsmanagerpro/falconproxy
+        ok "falconproxy, dnstt-server and udpgw deployed."
+    else
+        warn "This is an $(uname -m) server; the bundled falconproxy is x86-64 only, so it was NOT deployed."
+        warn "falconproxy is unavailable here. DNSTT, udp-custom, ZiVPN and 3X-UI still work (they fetch ARM builds)."
+        ok "dnstt-server and udpgw deployed."
+    fi
 }
 
 deploy_helpers() {

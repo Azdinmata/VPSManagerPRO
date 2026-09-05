@@ -53,6 +53,14 @@ The access link for the web panel is printed at the end of the install —
 `http://<VPS_IP>:3100` (open it directly in any browser; open TCP 3100 in the
 provider firewall if the panel is served by IP).
 
+**Platform support** — x86-64 is fully supported. On ARM64 (e.g. Oracle free
+tier) DNSTT / udp-custom / ZiVPN / the panel and 3X-UI all still work (they
+fetch ARM builds), but **Falcon Proxy is x86-64 only**: the bundle ships an
+x86-64 binary, the original release host is offline, and no ARM build exists
+in the ecosystem. The menu auto-detects the architecture and skips Falcon
+Proxy cleanly on ARM; you can drop your own arm64 `falconproxy` at
+`/usr/local/bin/falconproxy` and the menu will pick it up.
+
 The installer:
 - verifies bundle checksums,
 - creates fresh `/etc/vpsmanagerpro` state — **empty `users.db`**, empty
