@@ -1,6 +1,6 @@
 # VPSManagerPRO Live - artifact checksums (sha256sum -c SHA256SUMS)
 # Regenerated on this build; verify binaries before deploying to a new VPS.
-61a0f1d51cfdf6cec68ed8277d992929d73f835df390b51c5f9ea398cdc85966 *menu
+40cf02d17b24886ff33b525b517fe8136d6d730f837342be0cb175767c5ee1c9 *menu
 f6e783a3b65351c721ad6082d7f915cd3f36d01aabadbe3aa9a2333052cd71d4 *daemons/falconproxy
 bf291ed4b9988a82d5501bc45e23ceba6ff1e1b3439b43d73a94d4c9cc83ccd1 *daemons/dnstt-server
 48832133b7bdff20261bac41713e3ea231404b85764c1143d2095311867fb43f *daemons/udpgw
@@ -16,7 +16,7 @@ ad6d10f572268d1bf7d1c554f945077cf5c9464ef8efc4a692d45c2343d83824 *scripts/vpsman
 332955d28e18f520ab90e8bc79297d2b4dc2d7586f6f3aa8c862c0496a72d2d0 *scripts/vpsmanagerpro-trial-cleanup.sh
 b466d8f588c61b4d83aa2ba8f3d6b0e9dab241b5e01e4670a530c88620fef085 *panel/.gitignore
 b5709680f6813985e66cf951f5065e8e9545561b4c666c80710835b494026e2b *panel/config/nginx/panel.conf.example
-9a66516442942c70e4ebcb0419d1e2b5556b3726e5ad9735feded9b5dad5b51d *panel/install-panel.sh
+701d5cc16863d609543e125df283166a8a470d0a2f3e2f097f154ddb428706d9 *panel/install-panel.sh
 e6e50d774ae29109b8933a935846ddb97c1ce8b3497d45451d2e664ebc398cce *panel/next.config.mjs
 9dd9d642cdb87d4d5b3173217e0c45429b3e47a6f5cf5fb0ead6c644ec5fed01 *panel/next-env.d.ts
 170847e2acfd8f5377242100cc5b9c6905cd9630833a55364c62c342193a7e4b *panel/package.json
