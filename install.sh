@@ -9,11 +9,14 @@
 # maintained http-custom upstream).
 #
 # Usage:
-#   bash install.sh                # interactive
-#   DESEC_TOKEN=... DESEC_DOMAIN=... bash install.sh --yes   # non-interactive
+#   bash install.sh                                       # interactive (web panel auto-installs too)
+#   bash install.sh --panel-hostname panel.example.com    # panel behind an nginx TLS vhost
+#   bash install.sh --no-panel                            # skip the web control panel
+#   DESEC_TOKEN=... DESEC_DOMAIN=... bash install.sh --yes
 #
 # After it finishes, run `menu` for the interactive protocol installers
-# (DNSTT, udp-custom, ZiVPN, edge/SSL stack, 3X-UI, SSH banners).
+# (DNSTT, udp-custom, ZiVPN, edge/SSL stack, 3X-UI, SSH banners). The access
+# link for the web panel is printed at the end of the install.
 
 set -euo pipefail
 
@@ -23,7 +26,16 @@ C_BLUE=$'\e[1;34m'; C_PURPLE=$'\e[1;35m'; C_CYAN=$'\e[1;36m'; C_WHITE=$'\e[1;37m
 
 BUNDLE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ASSUME_YES=0
-[[ "${1:-}" == "--yes" ]] && ASSUME_YES=1
+PANEL_SKIP=0
+PANEL_HOSTNAME="${VMP_PANEL_HOSTNAME:-}"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --yes)             ASSUME_YES=1; shift ;;
+        --no-panel)        PANEL_SKIP=1; shift ;;
+        --panel-hostname)  PANEL_HOSTNAME="${2:-}"; shift 2 ;;
+        *) echo "unknown option: $1" >&2; exit 2 ;;
+    esac
+done
 
 # ------------------------------------------------------------ constants ----
 VMP_DIR="/etc/vpsmanagerpro"
@@ -260,6 +272,45 @@ compat_aliases() {
     fi
 }
 
+install_nodejs() {
+    if command -v node >/dev/null 2>&1 && node -e 'process.exit(+(process.versions.node.split(".")[0]) >= 18 ? 0 : 1)' 2>/dev/null; then
+        ok "Node.js $(node -v) already installed."
+        return 0
+    fi
+    log "Installing Node.js 20 LTS from NodeSource..."
+    export DEBIAN_FRONTEND=noninteractive
+    if ! curl -fsSL https://deb.nodesource.com/setup_20.x | bash - >/dev/null 2>&1; then
+        warn "NodeSource setup failed — cannot install the web panel automatically."
+        warn "Install Node.js 18+ manually, then run: cd panel && bash install-panel.sh"
+        return 1
+    fi
+    apt-get install -y -qq nodejs >/dev/null || {
+        warn "nodejs package install failed — web panel skipped."
+        return 1
+    }
+    ok "Node.js $(node -v) installed."
+}
+
+install_panel() {
+    if [[ $PANEL_SKIP -eq 1 ]]; then
+        warn "Web panel skipped (--no-panel). Install later: cd panel && bash install-panel.sh [--hostname DOMAIN]"
+        return 0
+    fi
+    log "Installing the web control panel..."
+    install_nodejs || return 0
+    local args=()
+    if [[ -n "$PANEL_HOSTNAME" ]]; then
+        args=( "--hostname" "$PANEL_HOSTNAME" )
+    else
+        args=( "--no-nginx" )
+    fi
+    if bash "$BUNDLE_DIR/panel/install-panel.sh" "${args[@]}"; then
+        ok "Web panel installed and enabled (vpsmanagerpro-panel.service)."
+    else
+        warn "Panel installer returned non-zero — inspect: journalctl -u vpsmanagerpro-panel"
+    fi
+}
+
 print_summary() {
     cat <<EOF
 
@@ -285,6 +336,23 @@ ${C_GREEN}  VPSManagerPRO Live is installed.${C_RESET}
     falconproxy --help
     ss -tlnp | grep falconproxy
 EOF
+    if [[ $PANEL_SKIP -eq 0 ]]; then
+        IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+        echo ""
+        echo -e "  ${C_PURPLE}═══ WEB CONTROL PANEL ═══${C_RESET}"
+        if [[ -n "$PANEL_HOSTNAME" ]]; then
+            echo -e "  ${C_WHITE}LINK  →  https://$PANEL_HOSTNAME${C_RESET}"
+            echo -e "  (obtain TLS first:  certbot --nginx -d $PANEL_HOSTNAME)"
+        else
+            echo -e "  ${C_WHITE}LINK  →  http://localhost:3100${C_RESET}  (via SSH tunnel):"
+            echo -e "  ssh -L 3100:127.0.0.1:3100 root@${IP:-<SERVER_IP>}   # then open the link in your browser"
+        fi
+        if [[ -n "$PANEL_HOSTNAME" ]]; then
+            echo -e "  Until TLS is issued, the link above works through the same tunnel:"
+            echo -e "  ssh -L 3100:127.0.0.1:3100 root@${IP:-<SERVER_IP>}   # then open http://localhost:3100"
+        fi
+        echo -e "  First login: user ${C_WHITE}admin${C_RESET}, set a password (8+ chars), then enroll the TOTP code."
+    fi
     echo -e "${C_YELLOW}Compat: /etc/firewallfalcon -> /etc/vpsmanagerpro symlink created for legacy paths (falconproxy data, old cert names).${C_RESET}"
     echo -e "${C_YELLOW}Current version tracking: SHA256SUMS in $BUNDLE_DIR/SHA256SUMS${C_RESET}"
 }
@@ -306,6 +374,7 @@ main() {
     open_base_ports
     run_menu_setup
     compat_aliases
+    install_panel
     print_summary
 }
 

@@ -25,15 +25,33 @@ original project is used anywhere.
 
 ## Quick start (new VPS)
 
+The repo is **private**, so on the VPS clone it with GitHub auth (a personal
+access token, or `gh`):
+
 ```bash
-# 1. upload the folder and install
+# option A — one-off clone with a GitHub PAT (create one: github.com/settings/tokens)
+git clone https://oauth2:<YOUR_PAT>@github.com/Azdinmata/VPSManagerPRO.git
+
+# option B — gh CLI (device-code login, like on a desktop)
+#   apt install gh   &&   gh auth login   &&   gh repo clone Azdinmata/VPSManagerPRO
+cd VPSManagerPRO
+
+# 1. install everything — the web control panel is installed AUTOMATICALLY
 bash install.sh
-#    or non-interactively:
+#    panel behind your own domain/TLS (nginx vhost + certbot note):
+bash install.sh --panel-hostname panel.example.com
+#    panel install optional flags:  --no-panel       skip the web panel
+#    non-interactive wireguard/edge options:
 DESEC_TOKEN=... DESEC_DOMAIN=... EDGE_DOMAIN=... EDGE_EMAIL=... bash install.sh --yes
 
 # 2. open the menu and install the tunnels:
 menu
 ```
+
+The access link for the web panel is printed at the end of the install —
+`https://panel.example.com` if you passed `--panel-hostname`, otherwise
+`http://localhost:3100` reached through an SSH tunnel
+(`ssh -L 3100:127.0.0.1:3100 root@<SERVER_IP>`).
 
 The installer:
 - verifies bundle checksums,
@@ -43,7 +61,9 @@ The installer:
 - generates a **new** self-signed edge cert (`vpsmanagerpro.pem`),
 - writes `ssh` open drops-in (root login, password auth, TCP forwarding),
 - optionally records your own **deSEC** token/zone (never the leaked one),
-- runs `menu --install-setup` to install the limiter/trial services.
+- runs `menu --install-setup` to install the limiter/trial services,
+- auto-installs the **web panel** (`--panel-hostname`, `--no-panel`, or a new
+  `VMP_PANEL_HOSTNAME` env var; Node.js 18+ is installed automatically).
 
 ## Falcon Proxy — what was fixed
 
@@ -197,10 +217,10 @@ Features:
 - **Banner** — static `/etc/bannerssh` plus the per-user dynamic banner system.
 - **Activity** — audit trail (`/etc/vpsmanagerpro/panel/audit.jsonl`).
 
-Install after the main `install.sh`:
+--- `install.sh` now installs the panel automatically (no separate step). To
+manually (re)install it later:
 
 ```bash
-# upload the folder, then on the VPS:
 cd panel                      # the panel source directory
 VMP_ADMIN_USER=admin bash install-panel.sh --hostname panel.example.com
 ```
