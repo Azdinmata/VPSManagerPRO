@@ -1957,16 +1957,29 @@ install_udp_custom() {
     rm -rf "$UDP_CUSTOM_DIR"
     mkdir -p "$UDP_CUSTOM_DIR"
 
+    # True only when a binary actually EXECUTES on this machine (arch matches).
+    # Exit 126/127 = "cannot execute" (Exec format error / no loader) etc.
+    exec_runs() { local rc; "$1" --help >/dev/null 2>&1; rc=$?; [[ $rc -ne 126 && $rc -ne 127 ]]; }
+
     echo -e "\n${C_GREEN}⚙️ Detecting system architecture...${C_RESET}"
     local arch
     arch=$(uname -m)
-    local binary_url=""
+    echo -e "${C_BLUE}ℹ️ Detected architecture: $arch.${C_RESET}"
+
+    # Mirror list, newest-first. Upstream http-custom dropped the ARM udp-custom
+    # build; the maintained FirewallFalcon project mirrors both archs on Codeberg.
+    local -a udp_sources=()
     if [[ "$arch" == "x86_64" ]]; then
-        binary_url="https://github.com/http-custom/udp-custom/raw/main/bin/udp-custom-linux-amd64"
-        echo -e "${C_BLUE}ℹ️ Detected x86_64 (amd64) architecture.${C_RESET}"
+        udp_sources=(
+            "https://codeberg.org/aljailane/fm/raw/branch/main/udp/udp-custom-linux-amd64"
+            "https://github.com/http-custom/udp-custom/raw/main/bin/udp-custom-linux-amd64"
+        )
+        echo -e "${C_BLUE}ℹ️ Will use an x86_64 (amd64) udp-custom binary.${C_RESET}"
     elif [[ "$arch" == "aarch64" || "$arch" == "arm64" ]]; then
-        binary_url="https://github.com/http-custom/udp-custom/raw/main/bin/udp-custom-linux-arm"
-        echo -e "${C_BLUE}ℹ️ Detected ARM64 architecture.${C_RESET}"
+        udp_sources=(
+            "https://codeberg.org/aljailane/fm/raw/branch/main/udp/udp-custom-linux-arm"
+        )
+        echo -e "${C_BLUE}ℹ️ Will use an ARM64 udp-custom binary.${C_RESET}"
     else
         echo -e "\n${C_RED}❌ Unsupported architecture: $arch. Cannot install udp-custom.${C_RESET}"
         rm -rf "$UDP_CUSTOM_DIR"
@@ -1974,23 +1987,55 @@ install_udp_custom() {
     fi
 
     echo -e "\n${C_GREEN}📥 Downloading udp-custom binary...${C_RESET}"
-    wget -q --show-progress -O "$UDP_CUSTOM_DIR/udp-custom" "$binary_url"
-    if [ $? -ne 0 ]; then
-        echo -e "\n${C_RED}❌ Failed to download the udp-custom binary.${C_RESET}"
+    local bin_ok=0 u
+    for u in "${udp_sources[@]}"; do
+        if wget -q -O "$UDP_CUSTOM_DIR/udp-custom" "$u"; then
+            chmod +x "$UDP_CUSTOM_DIR/udp-custom"
+            if exec_runs "$UDP_CUSTOM_DIR/udp-custom"; then
+                bin_ok=1
+                echo -e "${C_GREEN}✅ Got a runnable udp-custom binary for $arch.${C_RESET}"
+                break
+            fi
+            echo -e "${C_YELLOW}⚠️ Binary from $u does not execute on $arch — trying the next mirror.${C_RESET}"
+            rm -f "$UDP_CUSTOM_DIR/udp-custom"
+        fi
+    done
+    if [[ $bin_ok -eq 0 ]]; then
+        echo -e "\n${C_RED}❌ Failed to download/execute a udp-custom binary for $arch.${C_RESET}"
         rm -rf "$UDP_CUSTOM_DIR"
         return
     fi
-    chmod +x "$UDP_CUSTOM_DIR/udp-custom"
 
-    echo -e "\n${C_GREEN}📦 Downloading udpgw helper...${C_RESET}"
-    wget -q --show-progress -O "$UDPGW_BINARY" "https://raw.githubusercontent.com/http-custom/udp-custom/main/module/udpgw"
-    if [ $? -ne 0 ]; then
-        echo -e "\n${C_RED}❌ Failed to download the udpgw helper binary.${C_RESET}"
-        rm -rf "$UDP_CUSTOM_DIR"
-        rm -f "$UDPGW_BINARY"
-        return
+    echo -e "\n${C_GREEN}📦 Setting up the udpgw helper...${C_RESET}"
+    if [[ "$arch" == "x86_64" ]]; then
+        if wget -q -O "$UDPGW_BINARY" "https://raw.githubusercontent.com/http-custom/udp-custom/main/module/udpgw" \
+           && chmod +x "$UDPGW_BINARY" && exec_runs "$UDPGW_BINARY"; then
+            echo -e "${C_GREEN}✅ udpgw (prebuilt amd64) ready.${C_RESET}"
+        else
+            echo -e "\n${C_RED}❌ Failed to fetch a runnable udpgw for $arch.${C_RESET}"
+            rm -rf "$UDP_CUSTOM_DIR"
+            rm -f "$UDPGW_BINARY"
+            return
+        fi
+    else
+        echo -e "${C_YELLOW}ℹ️ No prebuilt udpgw for $arch — compiling from source (may take a minute)...${C_RESET}"
+        ff_apt_install cmake g++ make git >/dev/null 2>&1 || true
+        local temp_build="/tmp/badvpn_build"
+        rm -rf "$temp_build"
+        if git clone -q https://github.com/ambrop72/badvpn.git "$temp_build" \
+           && (cd "$temp_build" && cmake . >/dev/null 2>&1 && make >/dev/null 2>&1) \
+           && cp "$(find "$temp_build" -name badvpn-udpgw -type f | head -n 1)" "$UDPGW_BINARY"; then
+            chmod +x "$UDPGW_BINARY"
+            echo -e "${C_GREEN}✅ udpgw compiled for $arch.${C_RESET}"
+        else
+            echo -e "\n${C_RED}❌ Failed to compile udpgw for $arch.${C_RESET}"
+            echo -e "${C_YELLOW}   Ensure cmake, g++, make and git are installed, then retry.${C_RESET}"
+            rm -rf "$UDP_CUSTOM_DIR" "$temp_build"
+            rm -f "$UDPGW_BINARY"
+            return
+        fi
+        rm -rf "$temp_build"
     fi
-    chmod +x "$UDPGW_BINARY"
 
     echo -e "\n${C_GREEN}📝 Creating default config.json...${C_RESET}"
     cat > "$UDP_CUSTOM_DIR/config.json" <<EOF

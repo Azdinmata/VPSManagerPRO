@@ -1,6 +1,6 @@
 # VPSManagerPRO Live - artifact checksums (sha256sum -c SHA256SUMS)
 # Regenerated on this build; verify binaries before deploying to a new VPS.
-271504160ff05c452b3ba499583dd4e1266513eb63398e16ada886ac0d7677a0 *menu
+751992ca294e0aeb62795e97826ebcd57925a5b975456b6e91d15f7688dff2f2 *menu
 f6e783a3b65351c721ad6082d7f915cd3f36d01aabadbe3aa9a2333052cd71d4 *daemons/falconproxy
 bf291ed4b9988a82d5501bc45e23ceba6ff1e1b3439b43d73a94d4c9cc83ccd1 *daemons/dnstt-server
 48832133b7bdff20261bac41713e3ea231404b85764c1143d2095311867fb43f *daemons/udpgw
